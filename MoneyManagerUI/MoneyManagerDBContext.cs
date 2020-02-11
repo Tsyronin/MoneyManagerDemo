@@ -19,7 +19,7 @@ namespace MoneyManagerUI
         public virtual DbSet<Records> Records { get; set; }
         public virtual DbSet<RecordsTags> RecordsTags { get; set; }
         public virtual DbSet<Subcategories> Subcategories { get; set; }
-        public virtual DbSet<Tads> Tads { get; set; }
+        public virtual DbSet<Tags> Tags { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -64,9 +64,9 @@ namespace MoneyManagerUI
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_RecordsTags_Records");
 
-                entity.HasOne(d => d.Tad)
+                entity.HasOne(d => d.Tag)
                     .WithMany(p => p.RecordsTags)
-                    .HasForeignKey(d => d.TadId)
+                    .HasForeignKey(d => d.TagId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_RecordsTags_Tads");
             });
@@ -84,7 +84,7 @@ namespace MoneyManagerUI
                     .HasConstraintName("FK_Subcategories_Categories");
             });
 
-            modelBuilder.Entity<Tads>(entity =>
+            modelBuilder.Entity<Tags>(entity =>
             {
                 entity.Property(e => e.Name)
                     .IsRequired()
