@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 namespace MoneyManagerUI
 {
-    //comment
     public partial class Categories
     {
         public Categories()

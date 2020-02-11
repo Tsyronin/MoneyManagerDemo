@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace MoneyManagerUI
 {
-    public partial class Tads
+    public partial class Tags
     {
-        public Tads()
+        public Tags()
         {
             RecordsTags = new HashSet<RecordsTags>();
         }
