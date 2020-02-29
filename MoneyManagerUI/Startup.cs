@@ -9,6 +9,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
+using MoneyManagerUI.Models;
+using Microsoft.EntityFrameworkCore;
+
 namespace MoneyManagerUI
 {
     public class Startup
@@ -23,6 +26,8 @@ namespace MoneyManagerUI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            string connection = Configuration.GetConnectionString("DefaultConnection");
+            services.AddDbContext<MoneyManagerDBContext>(options => options.UseSqlServer(connection));
             services.AddControllersWithViews();
         }
 
@@ -50,7 +55,7 @@ namespace MoneyManagerUI
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Categories}/{action=Index}/{id?}");
             });
         }
     }
