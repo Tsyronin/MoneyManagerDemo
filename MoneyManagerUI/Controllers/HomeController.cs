@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MoneyManagerUI.Models;
+using Microsoft.AspNetCore.Mvc.Rendering;
+
+
+
 
 namespace MoneyManagerUI.Controllers
 {
@@ -18,10 +22,14 @@ namespace MoneyManagerUI.Controllers
             _logger = logger;
         }
 
+        [HttpGet]
         public IActionResult Index()
         {
+            
             return View();
         }
+
+        
 
         public IActionResult Privacy()
         {

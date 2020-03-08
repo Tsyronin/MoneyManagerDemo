@@ -1,0 +1,57 @@
+﻿@model IEnumerable<MoneyManagerUI.Records>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+
+<h1>Records in @ViewBag.CategoryName </h1>
+
+<h1>Index</h1>
+
+<p>
+    @*<a asp-action="Create" asp-route-id="@ViewBag.CategoryId">Create New Record</a>*@
+    @Html.ActionLink("Add new record", "Create", new { CategoryId = @ViewBag.CategoryId })
+</p>
+<table class="table">   
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Sum)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Date)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Category)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Subcategory)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Sum)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Date)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Category.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Subcategory.Name)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
