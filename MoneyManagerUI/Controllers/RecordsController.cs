@@ -62,6 +62,18 @@ namespace MoneyManagerUI.Controllers
 
             ViewBag.CategoryId = categoryId;
             ViewBag.CategoryName = _context.Categories.Where(c => c.Id == categoryId).FirstOrDefault().Name;
+            var subcatList = _context.Subcategories.Where(s => s.CatedoryId == categoryId).ToList();
+            ViewBag.Subcategories = new SelectList(subcatList, "Id", "Name");
+
+            //ViewBag.Tags = new SelectList(tagList, "Id", "Name");
+            var myList = new List<SelectListItem>();
+            foreach (var item in _context.Tags)
+            {
+                myList.Add(new SelectListItem { Text = item.Name, Value = item.Id.ToString()/*, Selected = false*/ });
+            }
+            ViewBag.Tags = myList;
+            //ViewBag.Tags = _context.Tags;
+
             return View();
         }
 
@@ -70,17 +82,17 @@ namespace MoneyManagerUI.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(int categoryId, [Bind("Id,Sum,CategoryId,SubcategoryId,Date")] Records records)
+        public async Task<IActionResult> Create(int categoryId, [Bind("Id,Sum,CategoryId,SubcategoryId,Date")] Records record)
         {
+            record.Date = DateTime.Now;
             if (ModelState.IsValid)
             {
-                _context.Add(records);
+                _context.Add(record);
                 await _context.SaveChangesAsync();
                 //return RedirectToAction(nameof(Index));
                 //
                 //
                 //
-                //Might need some changes
                 return RedirectToAction("Index", "Records", new { id = categoryId, name = _context.Categories.Where(c => c.Id == categoryId).FirstOrDefault().Name });
             }
             //ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", records.CategoryId);

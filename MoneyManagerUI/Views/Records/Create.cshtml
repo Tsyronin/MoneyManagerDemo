@@ -9,6 +9,7 @@
 <h4>Records</h4>
 <hr />
 <div class="row">
+
     <div class="col-md-4">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -17,19 +18,35 @@
                 <input asp-for="Sum" class="form-control" />
                 <span asp-validation-for="Sum" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="CategoryId" class="control-label"></label>
-                <select asp-for="CategoryId" class ="form-control" asp-items="ViewBag.CategoryId"></select>
-            </div>
+            <input type="hidden" value="@ViewBag.CategoryId" name="CategoryId" />
             <div class="form-group">
                 <label asp-for="SubcategoryId" class="control-label"></label>
-                <select asp-for="SubcategoryId" class ="form-control" asp-items="ViewBag.SubcategoryId"></select>
+                <select asp-for="SubcategoryId" class="form-control" asp-items="ViewBag.Subcategories"></select>
             </div>
-            <div class="form-group">
-                <label asp-for="Date" class="control-label"></label>
-                <input asp-for="Date" class="form-control" />
-                <span asp-validation-for="Date" class="text-danger"></span>
-            </div>
+
+            @*doesn't show up*@
+            <asp:ListBox ID="lblMultiSelect" runat="server">
+                <asp:ListItem Text="opt1" Value="opt1" />
+                <asp:ListItem Text="opt2" Value="opt2" />
+                <asp:ListItem Text="opt3" Value="opt3" />
+            </asp:ListBox>
+
+            <asp:ListBox runat="server" SelectionMode="Multiple">
+                <asp:ListItem Text="test1"></asp:ListItem>
+                <asp:ListItem Text="test2"></asp:ListItem>
+                <asp:ListItem Text="test3"></asp:ListItem>
+            </asp:ListBox>
+
+            @*doesn't accept the lambda function*@
+            @*@Html.ListBoxFor(x => x.Id, ViewBag.Tags, new { style = "width:200px" })
+
+            @Html.DropDownListFor(x => x.Id, ViewBag.Tags);*@
+
+            @*<div class="form-group">
+            <label asp-for="Date" class="control-label"></label>
+            <input asp-for="Date" class="form-control" />
+            <span asp-validation-for="Date" class="text-danger"></span>
+        </div>*@
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
