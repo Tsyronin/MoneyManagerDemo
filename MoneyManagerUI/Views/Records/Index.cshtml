@@ -5,9 +5,7 @@
 }
 
 
-<h1>Records in @ViewBag.CategoryName </h1>
-
-<h1>Index</h1>
+<h1>Records of @ViewBag.CategoryName </h1>
 
 <p>
     @*<a asp-action="Create" asp-route-id="@ViewBag.CategoryId">Create New Record</a>*@
@@ -49,7 +47,8 @@
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> |
+                <a asp-action="AddTag" asp-route-id="@item.Id">Add a Tag</a>
             </td>
         </tr>
 }
