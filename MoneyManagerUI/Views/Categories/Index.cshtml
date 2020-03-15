@@ -3,12 +3,114 @@
 @{
     ViewData["Title"] = "Index";
 }
-
-<h1>Index</h1>
-
+<h1>Select Category</h1>
+<button id="statsButton"
+        class="btn btn-success btn-lg float-right"
+        onclick="showHide()">
+    Show Statistics
+</button>
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+
+<script>
+    function showHide() {
+        var catChart = document.getElementById("catChart");
+        var dateChart = document.getElementById("dateChart");
+        var button = document.getElementById("statsButton")
+
+        if (catChart.style.display === "none") {
+            catChart.style.display = "block";
+            dateChart.style.display = "block";
+            button.textContent = "Hide Statistics";
+        } else {
+            button.textContent = "Show Statistics";
+            catChart.style.display = "none";
+            dateChart.style.display = "none";
+        }
+    }
+</script>
+
+<div class="container">
+    <div id="catChart"></div>
+</div>
+
+<div class="container">
+    <div id="dateChart"></div>
+</div>
+
+@section scripts{
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <script>
+        google.charts.load('current', { 'packages': ['corechart'] });
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+
+            $.get('/api/Charts/JsonDataCatSum', function (jsonData) {
+                var data = google.visualization.arrayToDataTable(jsonData, false);
+
+                var options = {
+                    title: "Spendings per category",
+                    height: 300
+                };
+
+                var chart = new google.visualization.PieChart(document.getElementById('catChart'));
+                chart.draw(data, options);
+                document.getElementById("catChart").style.display = "none";
+            })
+        }
+    </script>
+
+    <script>
+        google.charts.load('current', { 'packages': ['corechart'] });
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+
+            $.get('/api/Charts/JsonDataDateSum', function (jsonData) {
+                var data = google.visualization.arrayToDataTable(jsonData, false);
+
+                var options = {
+                    title: "Spendings per day",
+                };
+
+                var chart = new google.visualization.LineChart(document.getElementById('dateChart'));
+                chart.draw(data, options);
+                document.getElementById("dateChart").style.display = "none";
+            })
+        }
+    </script>
+}
+
+
+@*@section scripts2{
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+        <script>
+            google.charts.load('current', { 'packages': ['corechart'] });
+            google.charts.setOnLoadCallback(drawChart);
+
+            function drawChart() {
+
+                $.get('/api/Charts/JsonDataDateSum', function (jsonData) {
+                    var data = google.visualization.arrayToDataTable(jsonData, false);
+
+                    var options = {
+                        title: "Spendings per day",
+                        width: 500,
+                        height: 400
+                    };
+
+                    var chart = new google.visualization.LineChart(document.getElementById('chart2'));
+                    chart.draw(data, options);
+                    //document.getElementById("chart1").style.display = "none";
+                })
+            }
+        </script>
+    }*@
+
 <table class="table">
     <thead>
         <tr>
@@ -19,17 +121,20 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.Id">Records</a>
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

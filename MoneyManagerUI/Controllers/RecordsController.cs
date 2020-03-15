@@ -57,22 +57,18 @@ namespace MoneyManagerUI.Controllers
         // GET: Records/Create
         public IActionResult Create(int categoryId)
         {
-            //ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name");
-            //ViewData["SubcategoryId"] = new SelectList(_context.Subcategories, "Id", "Name");
-
             ViewBag.CategoryId = categoryId;
             ViewBag.CategoryName = _context.Categories.Where(c => c.Id == categoryId).FirstOrDefault().Name;
             var subcatList = _context.Subcategories.Where(s => s.CatedoryId == categoryId).ToList();
             ViewBag.Subcategories = new SelectList(subcatList, "Id", "Name");
 
-            //ViewBag.Tags = new SelectList(tagList, "Id", "Name");
+            //For creating tags
             var myList = new List<SelectListItem>();
             foreach (var item in _context.Tags)
             {
                 myList.Add(new SelectListItem { Text = item.Name, Value = item.Id.ToString()/*, Selected = false*/ });
             }
             ViewBag.Tags = myList;
-            //ViewBag.Tags = _context.Tags;
 
             return View();
         }
@@ -185,6 +181,24 @@ namespace MoneyManagerUI.Controllers
             _context.Records.Remove(records);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> AddTag(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var records = await _context.Records.FindAsync(id);
+            if (records == null)
+            {
+                return NotFound();
+            }
+            //ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", records.CategoryId);
+            //ViewData["SubcategoryId"] = new SelectList(_context.Subcategories, "Id", "Name", records.SubcategoryId);
+            //return View(records);
+            return RedirectToAction("Create", "RecordsTags", new { recordId = records.Id });
         }
 
         private bool RecordsExists(int id)
