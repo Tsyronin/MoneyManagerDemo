@@ -1,17 +1,11 @@
 ﻿@model IEnumerable<MoneyManagerUI.Records>
 
-@{
-    ViewData["Title"] = "Index";
-}
-
-
-<h1>Records of @ViewBag.CategoryName </h1>
+    <h1>Records with '@ViewBag.TagName' tag</h1>
 
 <p>
-    @Html.ActionLink("Add new record", "Create", new { CategoryId = @ViewBag.CategoryId })
+    <a asp-action="Create">Create New</a>
 </p>
-
-<table class="table" >   
+<table class="table">
     <thead>
         <tr>
             <th>
@@ -47,8 +41,7 @@
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> |
-                <a asp-action="AddTag" asp-route-id="@item.Id">Add a Tag</a>
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
             </td>
         </tr>
 }

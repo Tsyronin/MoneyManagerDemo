@@ -21,7 +21,9 @@ namespace MoneyManagerUI.Controllers
         // GET: RecordsTags
         public async Task<IActionResult> Index()
         {
-            var moneyManagerDBContext = _context.RecordsTags.Include(r => r.Record).Include(r => r.Tag);
+            var moneyManagerDBContext = _context.RecordsTags
+                                        .Include(r => r.Record)
+                                        .Include(r => r.Tag);
             return View(await moneyManagerDBContext.ToListAsync());
         }
 
@@ -34,9 +36,9 @@ namespace MoneyManagerUI.Controllers
             }
 
             var recordsTags = await _context.RecordsTags
-                .Include(r => r.Record)
-                .Include(r => r.Tag)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                                    .Include(r => r.Record)
+                                    .Include(r => r.Tag)
+                                    .FirstOrDefaultAsync(m => m.Id == id);
             if (recordsTags == null)
             {
                 return NotFound();
