@@ -6,18 +6,18 @@
 
 <form asp-controller="Records" asp-action="IndexByTag" class="form-group">
     <div class="col-sm-3 float-right">
-        <select name="tag" class="form-control float-right" asp-items="ViewBag.Tags" ></select>
+        <select name="tag" class="form-control float-right" asp-items="ViewBag.Tags"></select>
         <input type="submit" value="Search" class="btn btn-primary float-right" />
+        <a asp-controller="Tags" asp-action="Create" class="float-right" style="font-size:30px;">+</a>
     </div>
 </form>
 </br>
 </br>
 
-
 <h1>Select Category</h1>
 <div class="col-sm-3 float-right">
     <button id="statsButton"
-            class="btn btn-success btn-lg float-right"
+            class="btn btn-secondary btn-lg float-right"
             onclick="showHide()">
         Show Statistics
     </button>

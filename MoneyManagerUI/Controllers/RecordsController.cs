@@ -81,11 +81,12 @@ namespace MoneyManagerUI.Controllers
             ViewBag.Subcategories = new SelectList(subcatList, "Id", "Name");
 
             //For creating tags
-            var myList = new List<SelectListItem>();
-            foreach (var item in _context.Tags)
-            {
-                myList.Add(new SelectListItem { Text = item.Name, Value = item.Id.ToString()/*, Selected = false*/ });
-            }
+            //var myList = new List<SelectListItem>();
+            //foreach (var item in _context.Tags)
+            //{
+            //    myList.Add(new SelectListItem { Text = item.Name, Value = item.Id.ToString()/*, Selected = false*/ });
+            //}
+            MultiSelectList myList = new MultiSelectList(_context.Tags, "Id", "Name");
             ViewBag.Tags = myList;
 
             return View();

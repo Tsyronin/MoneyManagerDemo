@@ -21,11 +21,6 @@ namespace MoneyManagerUI.Controllers
         // GET: Categories
         public async Task<IActionResult> Index()
         {
-            //var myList = new List<SelectListItem>();
-            //foreach (var item in _context.Tags)
-            //{
-            //    myList.Add(new SelectListItem { Text = item.Name, Value = item.Id.ToString()});
-            //}
             SelectList myList = new SelectList(_context.Tags, "Id", "Name");
             ViewBag.Tags = myList;
             return View(await _context.Categories.ToListAsync());
