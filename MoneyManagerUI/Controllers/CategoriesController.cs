@@ -21,6 +21,8 @@ namespace MoneyManagerUI.Controllers
         // GET: Categories
         public async Task<IActionResult> Index()
         {
+            SelectList myList = new SelectList(_context.Tags, "Id", "Name");
+            ViewBag.Tags = myList;
             return View(await _context.Categories.ToListAsync());
         }
 
@@ -143,6 +145,24 @@ namespace MoneyManagerUI.Controllers
             _context.Categories.Remove(categories);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> AddSubcat(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var category = await _context.Categories
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (category == null)
+            {
+                return NotFound();
+            }
+
+            //return View(categories);
+            return RedirectToAction("Create", "Subcategories", new { id = category.Id, name = category.Name });
         }
 
         private bool CategoriesExists(int id)

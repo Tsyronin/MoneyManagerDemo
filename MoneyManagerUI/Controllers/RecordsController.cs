@@ -32,7 +32,25 @@ namespace MoneyManagerUI.Controllers
             return View(await RecordsByCategory.ToListAsync());
         }
 
-        
+        public async Task<IActionResult> IndexByTag(int? tag)
+        {
+            if (tag == null) return RedirectToAction("Index", "Categories");
+
+            ViewBag.TagId = tag;
+            ViewBag.TagName = _context.Tags.Find(tag).Name;
+
+            var recordIDs = _context.RecordsTags
+                            .Where(rt => rt.TagId == tag)
+                            .Select(rt => rt.RecordId).ToList();
+            var RecordsByTag = _context.Records
+                            .Where(r => recordIDs.Contains(r.Id))
+                            .Include(r => r.Category)
+                            .Include(r => r.Subcategory);
+
+            return View(await RecordsByTag.ToListAsync());
+        }
+
+
 
         // GET: Records/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -63,11 +81,12 @@ namespace MoneyManagerUI.Controllers
             ViewBag.Subcategories = new SelectList(subcatList, "Id", "Name");
 
             //For creating tags
-            var myList = new List<SelectListItem>();
-            foreach (var item in _context.Tags)
-            {
-                myList.Add(new SelectListItem { Text = item.Name, Value = item.Id.ToString()/*, Selected = false*/ });
-            }
+            //var myList = new List<SelectListItem>();
+            //foreach (var item in _context.Tags)
+            //{
+            //    myList.Add(new SelectListItem { Text = item.Name, Value = item.Id.ToString()/*, Selected = false*/ });
+            //}
+            MultiSelectList myList = new MultiSelectList(_context.Tags, "Id", "Name");
             ViewBag.Tags = myList;
 
             return View();

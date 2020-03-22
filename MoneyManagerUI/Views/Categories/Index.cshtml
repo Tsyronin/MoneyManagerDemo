@@ -3,15 +3,30 @@
 @{
     ViewData["Title"] = "Index";
 }
+
+<form asp-controller="Records" asp-action="IndexByTag" class="form-group">
+    <div class="col-sm-3 float-right">
+        <select name="tag" class="form-control float-right" asp-items="ViewBag.Tags"></select>
+        <input type="submit" value="Search" class="btn btn-primary float-right" />
+        <a asp-controller="Tags" asp-action="Create" class="float-right" style="font-size:30px;">+</a>
+    </div>
+</form>
+</br>
+</br>
+
 <h1>Select Category</h1>
-<button id="statsButton"
-        class="btn btn-success btn-lg float-right"
-        onclick="showHide()">
-    Show Statistics
-</button>
+<div class="col-sm-3 float-right">
+    <button id="statsButton"
+            class="btn btn-secondary btn-lg float-right"
+            onclick="showHide()">
+        Show Statistics
+    </button>
+</div>
+
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+</br>
 
 <script>
     function showHide() {
@@ -85,32 +100,6 @@
 }
 
 
-@*@section scripts2{
-        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-
-        <script>
-            google.charts.load('current', { 'packages': ['corechart'] });
-            google.charts.setOnLoadCallback(drawChart);
-
-            function drawChart() {
-
-                $.get('/api/Charts/JsonDataDateSum', function (jsonData) {
-                    var data = google.visualization.arrayToDataTable(jsonData, false);
-
-                    var options = {
-                        title: "Spendings per day",
-                        width: 500,
-                        height: 400
-                    };
-
-                    var chart = new google.visualization.LineChart(document.getElementById('chart2'));
-                    chart.draw(data, options);
-                    //document.getElementById("chart1").style.display = "none";
-                })
-            }
-        </script>
-    }*@
-
 <table class="table">
     <thead>
         <tr>
@@ -131,6 +120,7 @@
                     <a asp-action="Details" asp-route-id="@item.Id">Records</a>
                 </td>
                 <td>
+                    <a asp-action="AddSubcat" asp-route-id="@item.Id">Add Subcategory</a> |
                     <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                     <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
                 </td>

@@ -15,7 +15,7 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Sum" class="control-label"></label>
-                <input asp-for="Sum" class="form-control" />
+                <input asp-for="Sum" class="form-control" step="1" min="0" />
                 <span asp-validation-for="Sum" class="text-danger"></span>
             </div>
             <input type="hidden" value="@ViewBag.CategoryId" name="CategoryId" />
@@ -23,6 +23,13 @@
                 <label asp-for="SubcategoryId" class="control-label"></label>
                 <select asp-for="SubcategoryId" class="form-control" asp-items="ViewBag.Subcategories"></select>
             </div>
+
+            @*For tag list*@
+            @*<div class="form-group">
+                <label for="tags" class="control-label">Tags</label>
+                <select name="tags" asp-items="ViewBag.Tags" class="form-control" multiple="multiple"></select>
+            </div>*@
+            
 
             @*doesn't show up*@
             <asp:ListBox ID="lblMultiSelect" runat="server">
@@ -40,7 +47,7 @@
             @*doesn't accept the lambda function*@
             @*@Html.ListBoxFor(x => x.Id, ViewBag.Tags, new { style = "width:200px" })
 
-            @Html.DropDownListFor(x => x.Id, ViewBag.Tags);*@
+        @Html.DropDownListFor(x => x.Id, ViewBag.Tags);*@
 
             @*<div class="form-group">
             <label asp-for="Date" class="control-label"></label>

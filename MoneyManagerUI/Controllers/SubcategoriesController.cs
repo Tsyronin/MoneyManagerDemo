@@ -45,9 +45,14 @@ namespace MoneyManagerUI.Controllers
         }
 
         // GET: Subcategories/Create
-        public IActionResult Create()
+        public IActionResult Create(int? id, string? name)
         {
-            ViewData["CatedoryId"] = new SelectList(_context.Categories, "Id", "Name");
+            if (id == null) return RedirectToAction("Index", "Categories");
+
+            ViewBag.CategoryId = id;
+            ViewBag.CategoryName = name;
+
+            //ViewData["CatedoryId"] = new SelectList(_context.Categories, "Id", "Name");
             return View();
         }
 
@@ -60,6 +65,7 @@ namespace MoneyManagerUI.Controllers
         {
             if (ModelState.IsValid)
             {
+                subcategories.Id = 0;
                 _context.Add(subcategories);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
