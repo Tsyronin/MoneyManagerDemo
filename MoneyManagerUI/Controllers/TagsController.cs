@@ -138,6 +138,8 @@ namespace MoneyManagerUI.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            var rt = _context.RecordsTags.Where(rt => rt.TagId == id);
+            _context.RecordsTags.RemoveRange(rt);
             var tags = await _context.Tags.FindAsync(id);
             _context.Tags.Remove(tags);
             await _context.SaveChangesAsync();
