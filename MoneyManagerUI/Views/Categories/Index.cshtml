@@ -11,6 +11,7 @@
         <a asp-controller="Tags" asp-action="Create" class="float-right" style="font-size:30px;">+</a>
     </div>
 </form>
+
 </br>
 </br>
 
@@ -26,6 +27,7 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+
 </br>
 
 <script>
@@ -128,3 +130,15 @@
         }
     </tbody>
 </table>
+
+<div>
+    @using (Html.BeginForm("Import", "Categories", FormMethod.Post, new { enctype = "multipart/form-data", id = "frm-excel" }))
+    {
+        <div>
+            <input type="file" name="fileExcel" id="fileExcel" />
+            <div>
+                <input type="submit" value="Upload data" class="btn btn-success" />
+            </div>
+        </div>
+    }
+</div>

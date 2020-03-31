@@ -151,6 +151,13 @@ namespace MoneyManagerUI.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            var records = _context.Records.Where(r => r.SubcategoryId == id);
+            foreach (Records record in records)
+            {
+                var rt = _context.RecordsTags.Where(rt => rt.RecordId == record.Id);
+                _context.RecordsTags.RemoveRange(rt);
+            }
+            _context.Records.RemoveRange(records);
             var subcategories = await _context.Subcategories.FindAsync(id);
             _context.Subcategories.Remove(subcategories);
             await _context.SaveChangesAsync();

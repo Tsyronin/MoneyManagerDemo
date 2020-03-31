@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using ClosedXML.Excel;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -26,7 +29,7 @@ namespace MoneyManagerUI.Controllers
             ViewBag.CategoryId = id;
             ViewBag.CategoryName = name;
             var RecordsByCategory = _context.Records
-                                        .Where(r=>r.CategoryId == id)
+                                        .Where(r => r.CategoryId == id)
                                         .Include(r => r.Category)
                                         .Include(r => r.Subcategory);
             return View(await RecordsByCategory.ToListAsync());
@@ -104,15 +107,9 @@ namespace MoneyManagerUI.Controllers
             {
                 _context.Add(record);
                 await _context.SaveChangesAsync();
-                //return RedirectToAction(nameof(Index));
-                //
-                //
-                //
+
                 return RedirectToAction("Index", "Records", new { id = categoryId, name = _context.Categories.Where(c => c.Id == categoryId).FirstOrDefault().Name });
             }
-            //ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", records.CategoryId);
-            //ViewData["SubcategoryId"] = new SelectList(_context.Subcategories, "Id", "Name", records.SubcategoryId);
-            //return View(records);
             return RedirectToAction("Index", "Records", new { id = categoryId, name = _context.Categories.Where(c => c.Id == categoryId).FirstOrDefault().Name });
         }
 
@@ -196,6 +193,8 @@ namespace MoneyManagerUI.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            var rt = _context.RecordsTags.Where(rt => rt.RecordId == id);
+            _context.RecordsTags.RemoveRange(rt);
             var records = await _context.Records.FindAsync(id);
             _context.Records.Remove(records);
             await _context.SaveChangesAsync();
@@ -214,10 +213,48 @@ namespace MoneyManagerUI.Controllers
             {
                 return NotFound();
             }
-            //ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", records.CategoryId);
-            //ViewData["SubcategoryId"] = new SelectList(_context.Subcategories, "Id", "Name", records.SubcategoryId);
-            //return View(records);
             return RedirectToAction("Create", "RecordsTags", new { recordId = records.Id });
+        }
+
+        public ActionResult Export(int categoryId)
+        {
+            using (XLWorkbook workbook = new XLWorkbook(XLEventTracking.Disabled))
+            {
+                var category = _context.Categories.Find(categoryId);
+                //тут, для прикладу ми пишемо усі книжки з БД, в своїх проектах ТАК НЕ РОБИТИ (писати лише вибрані)
+
+                var worksheet = workbook.Worksheets.Add(category.Name);
+
+                worksheet.Cell("A1").Value = "Sum";
+                worksheet.Cell("B1").Value = "Date";
+                worksheet.Cell("C1").Value = "Subcategory";
+                worksheet.Cell("D1").Value = "Tags";
+                worksheet.Row(1).Style.Font.Bold = true;
+                var records = _context.Records.Where(r => r.CategoryId == categoryId).ToList();
+
+                for (int i = 0; i < records.Count; i++)
+                {
+                    worksheet.Cell(i + 2, 1).Value = records[i].Sum;
+                    worksheet.Cell(i + 2, 2).Value = records[i].Date.ToString();
+                    var subcatId = records[i].SubcategoryId;
+                    worksheet.Cell(i + 2, 3).Value = _context.Subcategories.Find(subcatId).Name;
+
+                    var rt = _context.RecordsTags.Where(item => item.RecordId == records[i].Id).Select(item => item.Tag.Name).ToList();
+                    var tagStr = String.Join(", ", rt);
+                    worksheet.Cell(i + 2, 4).Value = tagStr;
+                }
+
+                using (var stream = new MemoryStream())
+                {
+                    workbook.SaveAs(stream);
+                    stream.Flush();
+
+                    return new FileContentResult(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                    {
+                        FileDownloadName = $"MM_{DateTime.UtcNow.ToShortDateString()}.xlsx"
+                    };
+                }
+            }
         }
 
         private bool RecordsExists(int id)

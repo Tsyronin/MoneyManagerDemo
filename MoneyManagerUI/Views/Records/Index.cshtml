@@ -11,6 +11,8 @@
     @Html.ActionLink("Add new record", "Create", new { CategoryId = @ViewBag.CategoryId })
 </p>
 
+<input type="button" value="Get an .xlsx document" class="btn btn-success float-right" onclick="window.location='@Url.Action("Export", new { categoryId = @ViewBag.CategoryId })'" />
+
 <table class="table" >   
     <thead>
         <tr>

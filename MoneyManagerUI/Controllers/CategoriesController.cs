@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using ClosedXML.Excel;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -141,6 +144,18 @@ namespace MoneyManagerUI.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            var subcats = _context.Subcategories.Where(sc => sc.CatedoryId == id);
+            foreach (Subcategories subcat in subcats)
+            {
+                var records = _context.Records.Where(r => r.SubcategoryId == subcat.Id);
+                foreach (Records record in records)
+                {
+                    var rt = _context.RecordsTags.Where(rt => rt.RecordId == record.Id);
+                    _context.RecordsTags.RemoveRange(rt);
+                }
+                _context.Records.RemoveRange(records);
+            }
+            _context.Subcategories.RemoveRange(subcats);
             var categories = await _context.Categories.FindAsync(id);
             _context.Categories.Remove(categories);
             await _context.SaveChangesAsync();
@@ -164,6 +179,105 @@ namespace MoneyManagerUI.Controllers
             //return View(categories);
             return RedirectToAction("Create", "Subcategories", new { id = category.Id, name = category.Name });
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Import(IFormFile fileExcel)
+        {
+            if (ModelState.IsValid)
+            {
+                if (fileExcel != null)
+                {
+                    using (var stream = new FileStream(fileExcel.FileName, FileMode.Create))
+                    {
+                        await fileExcel.CopyToAsync(stream);
+                        using (XLWorkbook workBook = new XLWorkbook(stream, XLEventTracking.Disabled))
+                        {
+                            foreach (IXLWorksheet worksheet in workBook.Worksheets)
+                            {
+                                Categories category;
+                                var sheetCategory = (from categ in _context.Categories
+                                         where categ.Name.Contains(worksheet.Name)
+                                         select categ).ToList();
+                                if (sheetCategory.Count > 0)
+                                {
+                                    category = sheetCategory[0];
+                                }
+                                else
+                                {
+                                    category = new Categories() { Name = worksheet.Name };
+                                    _context.Categories.Add(category);
+                                }
+
+                                foreach (IXLRow row in worksheet.RowsUsed().Skip(1))
+                                {
+                                    try
+                                    {
+                                        Records record = new Records();
+                                        record.Sum = Convert.ToDecimal(row.Cell(1).GetDouble());
+                                        record.Date = row.Cell(2).GetDateTime();
+
+                                        Subcategories newSubcat;
+                                        var subcatStr = row.Cell(3).GetString();
+                                        var subcategory = (from subcat in _context.Subcategories
+                                                           where subcat.Name.Contains(subcatStr)
+                                                           select subcat).ToList();
+                                        if (subcategory.Count > 0)
+                                        {
+                                            newSubcat = subcategory[0];
+                                        }
+                                        else
+                                        {
+                                            newSubcat = new Subcategories { Name = subcatStr };
+                                            newSubcat.Catedory = category;
+                                            _context.Subcategories.Add(newSubcat);
+                                        }
+
+                                        record.Category = category;
+                                        record.Subcategory = newSubcat;
+                                        _context.Records.Add(record);
+
+                                        var tagNames = row.Cell(4).GetString().Split(", ");
+                                        foreach (String tagName in tagNames)
+                                        {
+                                            Tags tag;
+                                            var tags = (from T in _context.Tags
+                                                        where T.Name.Contains(tagName)
+                                                        select T).ToList();
+                                            if (tags.Count > 0)
+                                            {
+                                                tag = tags[0];
+                                            }
+                                            else
+                                            {
+                                                tag = new Tags();
+                                                tag.Name = tagName;
+                                                _context.Add(tag);
+                                                _context.SaveChanges();
+                                            }
+
+                                            RecordsTags rt = new RecordsTags();
+                                            rt.Record = record;
+                                            rt.Tag = tag;
+                                            _context.RecordsTags.Add(rt);
+                                        }
+
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        throw ex;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
 
         private bool CategoriesExists(int id)
         {
