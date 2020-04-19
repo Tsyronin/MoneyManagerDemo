@@ -3,17 +3,20 @@
 @{
     ViewData["Title"] = "Index";
 }
+@if (User.IsInRole("premiumUser"))
+{
+    <form asp-controller="Records" asp-action="IndexByTag" class="form-group">
+        <div class="col-sm-3 float-right brd">
+            <select name="tag" class="form-control float-right" asp-items="ViewBag.Tags"></select>
+            <input type="submit" value="Search" class="btn btn-primary float-right" />
+            <a asp-controller="Tags" asp-action="Index" class="float-left" style="font-size:25px;">Tags</a>
+        </div>
+    </form>
+    <br />
+    <br />
+    <br />
+}
 
-<form asp-controller="Records" asp-action="IndexByTag" class="form-group">
-    <div class="col-sm-3 float-right">
-        <select name="tag" class="form-control float-right" asp-items="ViewBag.Tags"></select>
-        <input type="submit" value="Search" class="btn btn-primary float-right" />
-        <a asp-controller="Tags" asp-action="Create" class="float-right" style="font-size:30px;">+</a>
-    </div>
-</form>
-
-</br>
-</br>
 
 <h1>Select Category</h1>
 <div class="col-sm-3 float-right">
@@ -28,7 +31,7 @@
     <a asp-action="Create">Create New</a>
 </p>
 
-</br>
+<br />
 
 <script>
     function showHide() {
@@ -49,11 +52,12 @@
 </script>
 
 <div class="container">
-    <div id="catChart"></div>
+    <div class="chartBrd" id="catChart">
+    </div>
 </div>
 
 <div class="container">
-    <div id="dateChart"></div>
+    <div class="chartBrd" id="dateChart"></div>
 </div>
 
 @section scripts{
@@ -114,31 +118,33 @@
     <tbody>
         @foreach (var item in Model)
         {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Name)
-                </td>
-                <td>
-                    <a asp-action="Details" asp-route-id="@item.Id">Records</a>
-                </td>
-                <td>
-                    <a asp-action="AddSubcat" asp-route-id="@item.Id">Add Subcategory</a> |
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                </td>
-            </tr>
+        <tr>
+            <td>
+                <a asp-action="Details" asp-route-id="@item.Id">@item.Name</a>
+            </td>
+            <td>
+                <a class="btn btn-sm btn-primary" asp-action="AddSubcat" asp-route-id="@item.Id">Add Subcategory</a>
+                <a class="btn btn-sm btn-primary" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+            </td>
+            <td>
+                <a class="btn btn-sm btn-outline-danger float-right" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
         }
     </tbody>
 </table>
 
-<div>
-    @using (Html.BeginForm("Import", "Categories", FormMethod.Post, new { enctype = "multipart/form-data", id = "frm-excel" }))
-    {
-        <div>
-            <input type="file" name="fileExcel" id="fileExcel" />
+@if (User.IsInRole("premiumUser"))
+{
+    <div>
+        @using (Html.BeginForm("Import", "Categories", FormMethod.Post, new { enctype = "multipart/form-data", id = "frm-excel" }))
+        {
             <div>
-                <input type="submit" value="Upload data" class="btn btn-success" />
+                <input type="file" name="fileExcel" id="fileExcel" />
+                <div>
+                    <input type="submit" value="Upload data" class="btn btn-success" />
+                </div>
             </div>
-        </div>
-    }
-</div>
+        }
+    </div>
+}

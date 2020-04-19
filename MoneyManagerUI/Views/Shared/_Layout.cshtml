@@ -7,13 +7,18 @@
             background-size: 109px 109px, 109px 109px,100% 6px, 109px 109px, 109px 109px !important;
             background-position: 54px 55px, 0px 0px, 0px 0px, 0px 0px, 0px 0px !important;
         }
+
         table {
             background-color: #d8d6e9;
         }
+
         .brd {
-            border: 4px solid grey; /* Параметры границы */
-            background: #e1f1e8; /* Цвет фона */
-            padding: 12px; /* Поля вокруг текста */
+            border: 4px solid steelblue;
+            background: #d8d6e9;
+            padding: 12px;
+        }
+        .chartBrd {
+            border: 1px solid grey;
         }
     </style>
     <meta charset="utf-8" />
@@ -26,22 +31,59 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-primary border-bottom box-shadow mb-3">
             <div class="container">
-                <a class="navbar-brand text-white" asp-area="" asp-controller="Categories" asp-action="Index">MoneyManager</a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <a class="navbar-brand text-white" asp-area="" asp-controller="Categories" asp-action="Index">MoneyManager</a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                            aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
 
-                <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="" asp-controller="Categories" asp-action="Index">Home</a>
+                    <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
+                        <ul class="navbar-nav flex-grow-1">
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-controller="Categories" asp-action="Index">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            </li>
+                            @if (User.IsInRole("admin"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-white" asp-controller="Roles" asp-action="Index">Roles</a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                    <ul class="navbar-nav float-right">
+                        <li class="nav-item float-right">
+                            <h5 class="nav-link text-white">@User.Identity.Name</h5>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        <li class="nav-item float-right">
+                            <a class="nav-link text-white" asp-controller="Account" asp-action="SignOut">Log out</a>
                         </li>
                     </ul>
-                </div>
+                }
+                else
+                {
+                    <a class="navbar-brand text-white" asp-controller="Home" asp-action="Index">MoneyManager</a>
+                    <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
+                        <ul class="navbar-nav flex-grow-1">
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <ul class="navbar-nav float-right">
+                        <li class="nav-item float-right">
+                            <a class="nav-link text-white" asp-controller="Account" asp-action="Login">Log in</a>
+                        </li>
+                        <li class="nav-item float-right">
+                            <a class="nav-link text-white" asp-controller="Account" asp-action="Register">Register</a>
+                        </li>
+                    </ul>
+                }
             </div>
         </nav>
     </header>

@@ -6,9 +6,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MoneyManagerUI;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace MoneyManagerUI.Controllers
 {
+    [Authorize]
     public class RecordsTagsController : Controller
     {
         private readonly MoneyManagerDBContext _context;

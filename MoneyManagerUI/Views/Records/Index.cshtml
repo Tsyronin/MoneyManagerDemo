@@ -11,9 +11,12 @@
     @Html.ActionLink("Add new record", "Create", new { CategoryId = @ViewBag.CategoryId })
 </p>
 
+@if (User.IsInRole("premiumUser"))
+{
 <input type="button" value="Get an .xlsx document" class="btn btn-success float-right" onclick="window.location='@Url.Action("Export", new { categoryId = @ViewBag.CategoryId })'" />
+}
 
-<table class="table" >   
+<table class="table">
     <thead>
         <tr>
             <th>
@@ -22,9 +25,9 @@
             <th>
                 @Html.DisplayNameFor(model => model.Date)
             </th>
-            <th>
+            @*<th>
                 @Html.DisplayNameFor(model => model.Category)
-            </th>
+            </th>*@
             <th>
                 @Html.DisplayNameFor(model => model.Subcategory)
             </th>
@@ -32,27 +35,30 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Sum)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Date)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Category.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Subcategory.Name)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> |
-                <a asp-action="AddTag" asp-route-id="@item.Id">Add a Tag</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Sum)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Date)
+                </td>
+                @*<td>
+                    @Html.DisplayFor(modelItem => item.Category.Name)
+                </td>*@
+                <td>
+                    @Html.DisplayFor(modelItem => item.Subcategory.Name)
+                </td>
+                <td>
+                    <a class="btn btn-sm btn-primary" asp-action="AddTag" asp-route-id="@item.Id">Add a Tag</a>
+                    <a class="btn btn-sm btn-primary" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                    @*<a class="btn btn-sm btn-primary" asp-action="Details" asp-route-id="@item.Id">Details</a> |*@
+                </td>
+                <td>
+                    <a class="btn btn-sm btn-outline-danger float-right" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

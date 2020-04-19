@@ -9,9 +9,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MoneyManagerUI;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace MoneyManagerUI.Controllers
 {
+    [Authorize]
     public class RecordsController : Controller
     {
         private readonly MoneyManagerDBContext _context;
@@ -31,10 +34,12 @@ namespace MoneyManagerUI.Controllers
             var RecordsByCategory = _context.Records
                                         .Where(r => r.CategoryId == id)
                                         .Include(r => r.Category)
-                                        .Include(r => r.Subcategory);
+                                        .Include(r => r.Subcategory)
+                                        .OrderByDescending(r => r.Date);
             return View(await RecordsByCategory.ToListAsync());
         }
 
+        [Authorize(Roles = "admin, premiumUser")]
         public async Task<IActionResult> IndexByTag(int? tag)
         {
             if (tag == null) return RedirectToAction("Index", "Categories");
@@ -221,7 +226,6 @@ namespace MoneyManagerUI.Controllers
             using (XLWorkbook workbook = new XLWorkbook(XLEventTracking.Disabled))
             {
                 var category = _context.Categories.Find(categoryId);
-                //тут, для прикладу ми пишемо усі книжки з БД, в своїх проектах ТАК НЕ РОБИТИ (писати лише вибрані)
 
                 var worksheet = workbook.Worksheets.Add(category.Name);
 
