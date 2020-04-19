@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -11,6 +7,11 @@ using Microsoft.Extensions.Hosting;
 
 using MoneyManagerUI.Models;
 using Microsoft.EntityFrameworkCore;
+
+using Microsoft.AspNetCore.Identity;
+
+using NETCore.MailKit.Extensions;
+using NETCore.MailKit.Infrastructure.Internal;
 
 namespace MoneyManagerUI
 {
@@ -28,6 +29,24 @@ namespace MoneyManagerUI
         {
             string connection = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<MoneyManagerDBContext>(options => options.UseSqlServer(connection));
+            services.AddControllersWithViews();
+
+            string connectionIdentity = Configuration.GetConnectionString("IdentityConnection");
+            services.AddDbContext<IdentityContext>(options => options.UseSqlServer(connectionIdentity));
+
+            services.AddIdentity<User, IdentityRole>(opts => {
+                opts.User.RequireUniqueEmail = true;
+                opts.SignIn.RequireConfirmedEmail = true;
+                opts.Password.RequiredLength = 5;
+                opts.Password.RequireNonAlphanumeric = false;
+                opts.Password.RequireLowercase = false; 
+                opts.Password.RequireUppercase = false;
+            })
+                .AddEntityFrameworkStores<IdentityContext>()
+                .AddDefaultTokenProviders();
+
+            services.AddMailKit(config => config.UseMailKit(Configuration.GetSection("Email").Get<MailKitOptions>()));
+
             services.AddControllersWithViews();
         }
 
@@ -49,13 +68,14 @@ namespace MoneyManagerUI
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Categories}/{action=Index}/{id?}");
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
             });
         }
     }

@@ -6,9 +6,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MoneyManagerUI;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MoneyManagerUI.Controllers
 {
+    [Authorize(Roles = "admin, premiumUser")]
     public class TagsController : Controller
     {
         private readonly MoneyManagerDBContext _context;

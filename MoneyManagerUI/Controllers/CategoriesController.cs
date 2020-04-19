@@ -9,9 +9,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MoneyManagerUI;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace MoneyManagerUI.Controllers
 {
+    [Authorize]
     public class CategoriesController : Controller
     {
         private readonly MoneyManagerDBContext _context;
@@ -44,7 +47,6 @@ namespace MoneyManagerUI.Controllers
                 return NotFound();
             }
 
-            //return View(categories);
             return RedirectToAction("Index", "Records", new { id = category.Id, name = category.Name });
         }
 
@@ -176,7 +178,6 @@ namespace MoneyManagerUI.Controllers
                 return NotFound();
             }
 
-            //return View(categories);
             return RedirectToAction("Create", "Subcategories", new { id = category.Id, name = category.Name });
         }
 
