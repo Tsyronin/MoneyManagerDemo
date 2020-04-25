@@ -7,10 +7,6 @@
 
 <h1>Records of @ViewBag.CategoryName </h1>
 
-<p>
-    @Html.ActionLink("Add new record", "Create", new { CategoryId = @ViewBag.CategoryId })
-</p>
-
 @if (User.IsInRole("premiumUser"))
 {
 <input type="button" value="Get an .xlsx document" class="btn btn-success float-right" onclick="window.location='@Url.Action("Export", new { categoryId = @ViewBag.CategoryId })'" />
@@ -25,9 +21,6 @@
             <th>
                 @Html.DisplayNameFor(model => model.Date)
             </th>
-            @*<th>
-                @Html.DisplayNameFor(model => model.Category)
-            </th>*@
             <th>
                 @Html.DisplayNameFor(model => model.Subcategory)
             </th>
@@ -44,16 +37,11 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.Date)
                 </td>
-                @*<td>
-                    @Html.DisplayFor(modelItem => item.Category.Name)
-                </td>*@
                 <td>
                     @Html.DisplayFor(modelItem => item.Subcategory.Name)
                 </td>
                 <td>
-                    <a class="btn btn-sm btn-primary" asp-action="AddTag" asp-route-id="@item.Id">Add a Tag</a>
                     <a class="btn btn-sm btn-primary" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
-                    @*<a class="btn btn-sm btn-primary" asp-action="Details" asp-route-id="@item.Id">Details</a> |*@
                 </td>
                 <td>
                     <a class="btn btn-sm btn-outline-danger float-right" asp-action="Delete" asp-route-id="@item.Id">Delete</a>

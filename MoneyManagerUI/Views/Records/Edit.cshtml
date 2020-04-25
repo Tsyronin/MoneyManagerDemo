@@ -1,4 +1,4 @@
-﻿@model MoneyManagerUI.Records
+﻿@model MoneyManagerUI.ViewModel.RecordViewModel
 
 @{
     ViewData["Title"] = "Edit";
@@ -18,21 +18,14 @@
                 <input asp-for="Sum" class="form-control" />
                 <span asp-validation-for="Sum" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="CategoryId" class="control-label"></label>
-                <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.CategoryId"></select>
-                <span asp-validation-for="CategoryId" class="text-danger"></span>
-            </div>
+            <input type="hidden" value="@ViewBag.CategoryId" name="CategoryId" />
             <div class="form-group">
                 <label asp-for="SubcategoryId" class="control-label"></label>
-                <select asp-for="SubcategoryId" class="form-control" asp-items="ViewBag.SubcategoryId"></select>
+                <select asp-for="SubcategoryId" class="form-control" asp-items="ViewBag.Subcategories"></select>
                 <span asp-validation-for="SubcategoryId" class="text-danger"></span>
             </div>
-            @*<div class="form-group">
-                <label asp-for="Date" class="control-label"></label>
-                <input asp-for="Date" class="form-control" />
-                <span asp-validation-for="Date" class="text-danger"></span>
-            </div>*@
+
+            @Html.ListBoxFor(model => model.TagIds, Model.Tags, new { size = 6 })
 
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />

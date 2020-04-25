@@ -1,10 +1,10 @@
-﻿@model MoneyManagerUI.Records
+﻿@model MoneyManagerUI.ViewModel.RecordViewModel
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create"; 
 }
 
-<h1>Add a Record</h1>
+<h1>Add a Record of "@ViewBag.CategoryName"</h1>
 
 <hr />
 <div class="row">
@@ -22,12 +22,16 @@
                 <select asp-for="SubcategoryId" class="form-control" asp-items="ViewBag.Subcategories"></select>
             </div>
 
+
+            @Html.ListBoxFor(model => model.TagIds, Model.Tags, new { size = 6 })
+
+
             @*For tag list*@
             @*<div class="form-group">
-                <label for="tags" class="control-label">Tags</label>
-                <select name="tags" asp-items="ViewBag.Tags" class="form-control" multiple="multiple"></select>
+                <label asp-for="Tags" class="control-label">Tags</label>
+                <select asp-for="Tags" asp-items="ViewBag.Tags" class="form-control" multiple="multiple"></select>
             </div>*@
-            
+
 
             @*doesn't show up*@
             <asp:ListBox ID="lblMultiSelect" runat="server">
