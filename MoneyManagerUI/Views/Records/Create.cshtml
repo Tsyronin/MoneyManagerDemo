@@ -11,26 +11,48 @@
     <div class="col-md-4">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
+            @*<div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">$</span>
+                </div>
                 <label asp-for="Sum" class="control-label"></label>
                 <input asp-for="Sum" class="form-control" step="1" min="0" />
                 <span asp-validation-for="Sum" class="text-danger"></span>
+                <div class="input-group-append">
+                    <span class="input-group-text">.00</span>
+                </div>
+            </div>*@
+
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">₴</span>
             </div>
+            <input asp-for="Sum" class="form-control" aria-label="Amount (to the nearest hryvna)" step="1" min="0" />
+            <div class="input-group-append">
+                <span class="input-group-text">.00</span>
+            </div>
+            <span asp-validation-for="Sum" class="text-danger"></span>
+
+        </div>
+
+
             <input type="hidden" value="@ViewBag.CategoryId" name="CategoryId" />
             <div class="form-group">
                 <label asp-for="SubcategoryId" class="control-label"></label>
                 <select asp-for="SubcategoryId" class="form-control" asp-items="ViewBag.Subcategories"></select>
             </div>
 
-
+            <div class="alert alert-warning" role="alert">
+                hold CTRL to select multiple tags
+            </div>
             @Html.ListBoxFor(model => model.TagIds, Model.Tags, new { size = 6 })
 
 
             @*For tag list*@
             @*<div class="form-group">
-                <label asp-for="Tags" class="control-label">Tags</label>
-                <select asp-for="Tags" asp-items="ViewBag.Tags" class="form-control" multiple="multiple"></select>
-            </div>*@
+            <label asp-for="Tags" class="control-label">Tags</label>
+            <select asp-for="Tags" asp-items="ViewBag.Tags" class="form-control" multiple="multiple"></select>
+        </div>*@
 
 
             @*doesn't show up*@

@@ -97,12 +97,6 @@ namespace MoneyManagerUI.Controllers
                 TagName = c.Name
             }).ToList();
             model.Tags = new MultiSelectList(tags, "TagId", "TagName");
-            model.TagIds = new[] { 1, 3 };
-
-
-
-            //MultiSelectList myList = new MultiSelectList(_context.Tags, "Id", "Name");
-            //ViewBag.Tags = myList;
 
             return View(model);
         }
@@ -148,6 +142,10 @@ namespace MoneyManagerUI.Controllers
                 return NotFound();
             }
             ViewBag.CategoryId = record.CategoryId;
+            //ViewBag.Sum = (int)record.Sum;
+            ViewBag.SubcategoryId = record.SubcategoryId;
+
+
 
             var subcatList = _context.Subcategories.Where(s => s.CatedoryId == record.CategoryId).ToList();
             ViewBag.Subcategories = new SelectList(subcatList, "Id", "Name");
@@ -162,7 +160,9 @@ namespace MoneyManagerUI.Controllers
             model.Tags = new MultiSelectList(tags, "TagId", "TagName");
             model.Id = id;
 
-            model.TagIds = _context.RecordsTags.Where(rt => rt.RecordId == id).Select(rt => rt.TagId).ToArray(); ;
+            model.TagIds = _context.RecordsTags.Where(rt => rt.RecordId == id).Select(rt => rt.TagId).ToArray();
+            model.Sum = (int)record.Sum;
+            model.SubcategoryId = record.SubcategoryId;
 
             ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", record.CategoryId);
             ViewData["SubcategoryId"] = new SelectList(_context.Subcategories, "Id", "Name", record.SubcategoryId);
@@ -260,10 +260,15 @@ namespace MoneyManagerUI.Controllers
         {
             var rt = _context.RecordsTags.Where(rt => rt.RecordId == id);
             _context.RecordsTags.RemoveRange(rt);
-            var records = await _context.Records.FindAsync(id);
-            _context.Records.Remove(records);
+            var record = await _context.Records.FindAsync(id);
+            var category = await _context.Categories.FirstOrDefaultAsync(m => m.Id == record.CategoryId);
+            _context.Records.Remove(record);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            if (category == null)
+            {
+                return NotFound();
+            }
+            return RedirectToAction("Index", "Records", new { id = category.Id, name = category.Name });
         }
 
         //public async Task<IActionResult> AddTag(int? id)

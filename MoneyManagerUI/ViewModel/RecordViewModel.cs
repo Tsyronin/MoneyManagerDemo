@@ -12,14 +12,14 @@ namespace MoneyManagerUI.ViewModel
         public int Id { get; set; }
 
         [Required]
-        [Column(TypeName = "decimal(10, 2)")]
-        public decimal Sum { get; set; }
+        //[Column(TypeName = "decimal(10, 1)")]
+        public int Sum { get; set; }
 
         public int CategoryId { get; set; }
 
         public int SubcategoryId { get; set; }
 
-        public int[] TagIds { get; set; }
+        public int[] TagIds { get; set; } = new int[] { };
         public MultiSelectList Tags { get; set; }
     }
 }
