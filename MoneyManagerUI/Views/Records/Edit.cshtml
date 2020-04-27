@@ -31,7 +31,7 @@
             </div>
 
             <div class="alert alert-warning" role="alert">
-                hold CTRL to select multiple tags
+                hold CTRL to unselect or select multiple tags
             </div>
             @Html.ListBoxFor(model => model.TagIds, Model.Tags, new { size = 6 })
 
@@ -43,7 +43,7 @@
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">Back to Home page</a>
 </div>
 
 @section Scripts {

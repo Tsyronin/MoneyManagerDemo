@@ -126,7 +126,7 @@
                 <a class="btn btn-sm btn-primary" asp-controller="Records" asp-action="Create" asp-route-id="@item.Id">Add Record</a>
             </td>
             <td>
-                <a class="btn btn-sm btn-primary" asp-action="AddSubcat" asp-route-id="@item.Id">Add Subcategory</a>
+                <a class="btn btn-sm btn-primary" asp-action="IndexByCategory" asp-controller="Subcategories" asp-route-id="@item.Id">Subcategories</a>
                 <a class="btn btn-sm btn-primary" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
             </td>
             <td>

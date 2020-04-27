@@ -142,30 +142,25 @@ namespace MoneyManagerUI.Controllers
                 return NotFound();
             }
             ViewBag.CategoryId = record.CategoryId;
-            //ViewBag.Sum = (int)record.Sum;
-            ViewBag.SubcategoryId = record.SubcategoryId;
-
-
 
             var subcatList = _context.Subcategories.Where(s => s.CatedoryId == record.CategoryId).ToList();
             ViewBag.Subcategories = new SelectList(subcatList, "Id", "Name");
-
-            var model = new RecordViewModel();
 
             var tags = _context.Tags.Select(c => new
             {
                 TagId = c.Id,
                 TagName = c.Name
             }).ToList();
-            model.Tags = new MultiSelectList(tags, "TagId", "TagName");
-            model.Id = id;
 
-            model.TagIds = _context.RecordsTags.Where(rt => rt.RecordId == id).Select(rt => rt.TagId).ToArray();
-            model.Sum = (int)record.Sum;
-            model.SubcategoryId = record.SubcategoryId;
+            var model = new RecordViewModel()
+            {
+                Id = id,
+                Sum = (int)record.Sum,
+                Tags = new MultiSelectList(tags, "TagId", "TagName"),
+                TagIds = _context.RecordsTags.Where(rt => rt.RecordId == id).Select(rt => rt.TagId).ToArray(),
+                SubcategoryId = record.SubcategoryId
+            };
 
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", record.CategoryId);
-            ViewData["SubcategoryId"] = new SelectList(_context.Subcategories, "Id", "Name", record.SubcategoryId);
             return View(model);
         }
 

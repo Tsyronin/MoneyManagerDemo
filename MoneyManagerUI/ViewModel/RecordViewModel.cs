@@ -12,11 +12,11 @@ namespace MoneyManagerUI.ViewModel
         public int Id { get; set; }
 
         [Required]
-        //[Column(TypeName = "decimal(10, 1)")]
         public int Sum { get; set; }
 
         public int CategoryId { get; set; }
 
+        [Display(Name = "Subcategory")]
         public int SubcategoryId { get; set; }
 
         public int[] TagIds { get; set; } = new int[] { };
