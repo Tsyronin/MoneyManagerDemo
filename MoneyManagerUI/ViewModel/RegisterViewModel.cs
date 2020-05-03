@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 
 namespace MoneyManagerUI.ViewModel
@@ -12,6 +13,7 @@ namespace MoneyManagerUI.ViewModel
 
         [Required]
         [Display(Name = "Year of birth")]
+        [Range(1900, 2020, ErrorMessage = "Invalid year of birth")]
         public int Year { get; set; }
 
         [Required]

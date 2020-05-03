@@ -266,20 +266,6 @@ namespace MoneyManagerUI.Controllers
             return RedirectToAction("Index", "Records", new { id = category.Id, name = category.Name });
         }
 
-        //public async Task<IActionResult> AddTag(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var records = await _context.Records.FindAsync(id);
-        //    if (records == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return RedirectToAction("Create", "RecordsTags", new { recordId = records.Id });
-        //}
 
         public ActionResult Export(int categoryId)
         {
@@ -294,7 +280,10 @@ namespace MoneyManagerUI.Controllers
                 worksheet.Cell("C1").Value = "Subcategory";
                 worksheet.Cell("D1").Value = "Tags";
                 worksheet.Row(1).Style.Font.Bold = true;
-                var records = _context.Records.Where(r => r.CategoryId == categoryId).ToList();
+                var records = _context.Records
+                                    .Where(r => r.CategoryId == categoryId)
+                                    .OrderByDescending(r => r.Date)
+                                    .ToList();
 
                 for (int i = 0; i < records.Count; i++)
                 {
