@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Identity;
 using MoneyManagerUI.Models;
 using MoneyManagerUI.ViewModel;
 using MoneyManagerUI.ViewModels;
-using MoneyManagerUI;
 using NETCore.MailKit.Core;
 
 namespace LibraryMVC.Controllers

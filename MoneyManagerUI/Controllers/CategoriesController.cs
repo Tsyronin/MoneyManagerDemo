@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,7 +7,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using MoneyManagerUI;
 using Microsoft.AspNetCore.Authorization;
 
 
@@ -265,7 +263,7 @@ namespace MoneyManagerUI.Controllers
                                         }
 
                                     }
-                                    catch (Exception ex)
+                                    catch (Exception)
                                     {
                                         return RedirectToAction("Index", "Categories", new { dataInputErrorMessage = "File contains invalid data. Upload hasn't been successful" });
                                     }
