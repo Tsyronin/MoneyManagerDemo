@@ -1,16 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using ClosedXML.Excel;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using MoneyManagerUI;
 using Microsoft.AspNetCore.Authorization;
-
+using MoneyManagerUI.ViewModel;
 
 namespace MoneyManagerUI.Controllers
 {
@@ -53,7 +50,8 @@ namespace MoneyManagerUI.Controllers
             var RecordsByTag = _context.Records
                             .Where(r => recordIDs.Contains(r.Id))
                             .Include(r => r.Category)
-                            .Include(r => r.Subcategory);
+                            .Include(r => r.Subcategory)
+                            .OrderByDescending(r => r.Date);
 
             return View(await RecordsByTag.ToListAsync());
         }
@@ -81,23 +79,23 @@ namespace MoneyManagerUI.Controllers
         }
 
         // GET: Records/Create
-        public IActionResult Create(int categoryId)
+        public IActionResult Create(int Id)
         {
-            ViewBag.CategoryId = categoryId;
-            ViewBag.CategoryName = _context.Categories.Where(c => c.Id == categoryId).FirstOrDefault().Name;
-            var subcatList = _context.Subcategories.Where(s => s.CatedoryId == categoryId).ToList();
+            ViewBag.CategoryId = Id;
+            ViewBag.CategoryName = _context.Categories.Where(c => c.Id == Id).FirstOrDefault().Name;
+            var subcatList = _context.Subcategories.Where(s => s.CatedoryId == Id).ToList();
             ViewBag.Subcategories = new SelectList(subcatList, "Id", "Name");
 
-            //For creating tags
-            //var myList = new List<SelectListItem>();
-            //foreach (var item in _context.Tags)
-            //{
-            //    myList.Add(new SelectListItem { Text = item.Name, Value = item.Id.ToString()/*, Selected = false*/ });
-            //}
-            MultiSelectList myList = new MultiSelectList(_context.Tags, "Id", "Name");
-            ViewBag.Tags = myList;
+            var model = new RecordViewModel();
 
-            return View();
+            var tags = _context.Tags.Select(c => new
+            {
+                TagId = c.Id,
+                TagName = c.Name
+            }).ToList();
+            model.Tags = new MultiSelectList(tags, "TagId", "TagName");
+
+            return View(model);
         }
 
         // POST: Records/Create
@@ -105,35 +103,62 @@ namespace MoneyManagerUI.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(int categoryId, [Bind("Id,Sum,CategoryId,SubcategoryId,Date")] Records record)
+        public async Task<IActionResult> Create(int categoryId, RecordViewModel recordVM)
         {
-            record.Date = DateTime.Now;
-            if (ModelState.IsValid)
+            var record = new Records()
             {
-                _context.Add(record);
-                await _context.SaveChangesAsync();
+                Sum = recordVM.Sum,
+                CategoryId = recordVM.CategoryId,
+                SubcategoryId = recordVM.SubcategoryId,
+                Date = DateTime.Now
+            };
+            _context.Add(record);
 
-                return RedirectToAction("Index", "Records", new { id = categoryId, name = _context.Categories.Where(c => c.Id == categoryId).FirstOrDefault().Name });
+            await _context.SaveChangesAsync();
+
+            foreach (var item in recordVM.TagIds)
+            {
+                var recordTag = new RecordsTags()
+                {
+                    RecordId = record.Id,
+                    TagId = item
+                };
+                _context.Add(recordTag);
             }
+            await _context.SaveChangesAsync();
+
             return RedirectToAction("Index", "Records", new { id = categoryId, name = _context.Categories.Where(c => c.Id == categoryId).FirstOrDefault().Name });
         }
 
         // GET: Records/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
+            var record = await _context.Records.FindAsync(id);
+            if (record == null)
             {
                 return NotFound();
             }
+            ViewBag.CategoryId = record.CategoryId;
 
-            var records = await _context.Records.FindAsync(id);
-            if (records == null)
+            var subcatList = _context.Subcategories.Where(s => s.CatedoryId == record.CategoryId).ToList();
+            ViewBag.Subcategories = new SelectList(subcatList, "Id", "Name");
+
+            var tags = _context.Tags.Select(c => new
             {
-                return NotFound();
-            }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", records.CategoryId);
-            ViewData["SubcategoryId"] = new SelectList(_context.Subcategories, "Id", "Name", records.SubcategoryId);
-            return View(records);
+                TagId = c.Id,
+                TagName = c.Name
+            }).ToList();
+
+            var model = new RecordViewModel()
+            {
+                Id = id,
+                Sum = (int)record.Sum,
+                Tags = new MultiSelectList(tags, "TagId", "TagName"),
+                TagIds = _context.RecordsTags.Where(rt => rt.RecordId == id).Select(rt => rt.TagId).ToArray(),
+                SubcategoryId = record.SubcategoryId
+            };
+
+            return View(model);
         }
 
         // POST: Records/Edit/5
@@ -141,36 +166,63 @@ namespace MoneyManagerUI.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Sum,CategoryId,SubcategoryId,Date")] Records records)
+        public async Task<IActionResult> Edit(int id, RecordViewModel recordVM)
         {
-            if (id != records.Id)
+            if (id != recordVM.Id)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            var oldTagIds = _context.RecordsTags.Where(rt => rt.RecordId == id).Select(rt => rt.TagId).ToList();
+            var newTagIds = recordVM.TagIds.ToList();
+            var addedTagIds = newTagIds.Except(oldTagIds);
+            var removedTagIds = oldTagIds.Except(newTagIds);
+
+            foreach(int newTagId in addedTagIds)
             {
-                try
+                RecordsTags recordTag = new RecordsTags()
                 {
-                    _context.Update(records);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!RecordsExists(records.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                    RecordId = id,
+                    TagId = newTagId
+                };
+                _context.RecordsTags.Add(recordTag);
             }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", records.CategoryId);
-            ViewData["SubcategoryId"] = new SelectList(_context.Subcategories, "Id", "Name", records.SubcategoryId);
-            return View(records);
+            foreach (int removedTagId in removedTagIds)
+            {
+                var removedTags = _context.RecordsTags.Where(rt => ((rt.RecordId == id) && (rt.TagId == removedTagId))).ToList();
+                _context.RecordsTags.RemoveRange(removedTags);
+            }
+
+            var oldRecord = _context.Records.Find(id);
+
+            Records UpRecord = new Records()
+            {
+                Id = id,
+                Sum = recordVM.Sum,
+                CategoryId = oldRecord.CategoryId,
+                SubcategoryId = recordVM.SubcategoryId,
+                Date = oldRecord.Date
+            };
+
+            _context.Entry<Records>(oldRecord).State = EntityState.Detached;
+
+            try
+            {
+                _context.Records.Update(UpRecord);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!RecordsExists(UpRecord.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Records/Delete/5
@@ -200,26 +252,17 @@ namespace MoneyManagerUI.Controllers
         {
             var rt = _context.RecordsTags.Where(rt => rt.RecordId == id);
             _context.RecordsTags.RemoveRange(rt);
-            var records = await _context.Records.FindAsync(id);
-            _context.Records.Remove(records);
+            var record = await _context.Records.FindAsync(id);
+            var category = await _context.Categories.FirstOrDefaultAsync(m => m.Id == record.CategoryId);
+            _context.Records.Remove(record);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        public async Task<IActionResult> AddTag(int? id)
-        {
-            if (id == null)
+            if (category == null)
             {
                 return NotFound();
             }
-
-            var records = await _context.Records.FindAsync(id);
-            if (records == null)
-            {
-                return NotFound();
-            }
-            return RedirectToAction("Create", "RecordsTags", new { recordId = records.Id });
+            return RedirectToAction("Index", "Records", new { id = category.Id, name = category.Name });
         }
+
 
         public ActionResult Export(int categoryId)
         {
@@ -234,7 +277,10 @@ namespace MoneyManagerUI.Controllers
                 worksheet.Cell("C1").Value = "Subcategory";
                 worksheet.Cell("D1").Value = "Tags";
                 worksheet.Row(1).Style.Font.Bold = true;
-                var records = _context.Records.Where(r => r.CategoryId == categoryId).ToList();
+                var records = _context.Records
+                                    .Where(r => r.CategoryId == categoryId)
+                                    .OrderByDescending(r => r.Date)
+                                    .ToList();
 
                 for (int i = 0; i < records.Count; i++)
                 {

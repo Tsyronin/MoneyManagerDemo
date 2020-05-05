@@ -1,4 +1,4 @@
-﻿@model MoneyManagerUI.Records
+﻿@model MoneyManagerUI.ViewModel.RecordViewModel
 
 @{
     ViewData["Title"] = "Edit";
@@ -13,26 +13,27 @@
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="Sum" class="control-label"></label>
-                <input asp-for="Sum" class="form-control" />
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">₴</span>
+                </div>
+                <input asp-for="Sum" class="form-control" aria-label="Amount (to the nearest hryvna)" step="1" min="0" />
                 <span asp-validation-for="Sum" class="text-danger"></span>
+                <div class="input-group-append">
+                    <span class="input-group-text">.00</span>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="CategoryId" class="control-label"></label>
-                <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.CategoryId"></select>
-                <span asp-validation-for="CategoryId" class="text-danger"></span>
-            </div>
+            <input type="hidden" value="@ViewBag.CategoryId" name="CategoryId" />
             <div class="form-group">
                 <label asp-for="SubcategoryId" class="control-label"></label>
-                <select asp-for="SubcategoryId" class="form-control" asp-items="ViewBag.SubcategoryId"></select>
+                <select asp-for="SubcategoryId" class="form-control" asp-items="@ViewBag.Subcategories"></select>
                 <span asp-validation-for="SubcategoryId" class="text-danger"></span>
             </div>
-            @*<div class="form-group">
-                <label asp-for="Date" class="control-label"></label>
-                <input asp-for="Date" class="form-control" />
-                <span asp-validation-for="Date" class="text-danger"></span>
-            </div>*@
+
+            <div class="alert alert-warning" role="alert">
+                hold CTRL to unselect or select multiple tags
+            </div>
+            @Html.ListBoxFor(model => model.TagIds, Model.Tags, new { size = 6 })
 
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
@@ -42,7 +43,7 @@
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">Back to Home page</a>
 </div>
 
 @section Scripts {

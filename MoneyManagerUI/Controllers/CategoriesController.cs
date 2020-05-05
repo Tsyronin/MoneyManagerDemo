@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,7 +7,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using MoneyManagerUI;
 using Microsoft.AspNetCore.Authorization;
 
 
@@ -25,8 +23,9 @@ namespace MoneyManagerUI.Controllers
         }
 
         // GET: Categories
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string dataInputErrorMessage = "")
         {
+            ViewBag.DataInputErrorMessage = dataInputErrorMessage;
             SelectList myList = new SelectList(_context.Tags, "Id", "Name");
             ViewBag.Tags = myList;
             return View(await _context.Categories.ToListAsync());
@@ -215,7 +214,7 @@ namespace MoneyManagerUI.Controllers
                                     try
                                     {
                                         Records record = new Records();
-                                        record.Sum = Convert.ToDecimal(row.Cell(1).GetDouble());
+                                        record.Sum = UInt32.Parse(row.Cell(1).GetString());
                                         record.Date = row.Cell(2).GetDateTime();
 
                                         Subcategories newSubcat;
@@ -264,9 +263,9 @@ namespace MoneyManagerUI.Controllers
                                         }
 
                                     }
-                                    catch (Exception ex)
+                                    catch (Exception)
                                     {
-                                        throw ex;
+                                        return RedirectToAction("Index", "Categories", new { dataInputErrorMessage = "File contains invalid data. Upload hasn't been successful" });
                                     }
                                 }
                             }

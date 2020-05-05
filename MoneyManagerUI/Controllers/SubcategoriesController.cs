@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using MoneyManagerUI;
 using Microsoft.AspNetCore.Authorization;
 
 
@@ -28,6 +25,15 @@ namespace MoneyManagerUI.Controllers
             return View(await moneyManagerDBContext.ToListAsync());
         }
 
+        public async Task<IActionResult> IndexByCategory(int id)
+        {
+            var category = _context.Categories.Where(c => c.Id == id).FirstOrDefault();
+            ViewBag.CategoryName = category.Name;
+            ViewBag.CategoryId = category.Id;
+            var subcatsByCat = _context.Subcategories.Where(s => s.CatedoryId == id).Include(s => s.Catedory);
+            return View(await subcatsByCat.ToListAsync());
+        }
+
         // GET: Subcategories/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -36,15 +42,16 @@ namespace MoneyManagerUI.Controllers
                 return NotFound();
             }
 
-            var subcategories = await _context.Subcategories
+            var subcategory = await _context.Subcategories
                 .Include(s => s.Catedory)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (subcategories == null)
+            ViewBag.CategoryId = subcategory.CatedoryId;
+            if (subcategory == null)
             {
                 return NotFound();
             }
 
-            return View(subcategories);
+            return View(subcategory);
         }
 
         // GET: Subcategories/Create
@@ -55,7 +62,6 @@ namespace MoneyManagerUI.Controllers
             ViewBag.CategoryId = id;
             ViewBag.CategoryName = name;
 
-            //ViewData["CatedoryId"] = new SelectList(_context.Categories, "Id", "Name");
             return View();
         }
 
@@ -64,17 +70,15 @@ namespace MoneyManagerUI.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,CatedoryId")] Subcategories subcategories)
+        public async Task<IActionResult> Create([Bind("Name,CatedoryId")] Subcategories subcategory)
         {
             if (ModelState.IsValid)
             {
-                subcategories.Id = 0;
-                _context.Add(subcategories);
+                _context.Add(subcategory);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("IndexByCategory", new { id = subcategory.CatedoryId });
             }
-            ViewData["CatedoryId"] = new SelectList(_context.Categories, "Id", "Name", subcategories.CatedoryId);
-            return View(subcategories);
+            return RedirectToAction("IndexByCategory", new { id = subcategory.CatedoryId });
         }
 
         // GET: Subcategories/Edit/5
@@ -85,13 +89,14 @@ namespace MoneyManagerUI.Controllers
                 return NotFound();
             }
 
-            var subcategories = await _context.Subcategories.FindAsync(id);
-            if (subcategories == null)
+            var subcategory = await _context.Subcategories.FindAsync(id);
+            ViewBag.CategoryId = subcategory.CatedoryId;
+            if (subcategory == null)
             {
                 return NotFound();
             }
-            ViewData["CatedoryId"] = new SelectList(_context.Categories, "Id", "Name", subcategories.CatedoryId);
-            return View(subcategories);
+            //ViewData["CatedoryId"] = new SelectList(_context.Categories, "Id", "Name", subcategories.CatedoryId);
+            return View(subcategory);
         }
 
         // POST: Subcategories/Edit/5
@@ -99,23 +104,28 @@ namespace MoneyManagerUI.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,CatedoryId")] Subcategories subcategories)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,CatedoryId")] Subcategories subcategory)
         {
-            if (id != subcategories.Id)
+            var categoryId = subcategory.CatedoryId;
+            if (id != subcategory.Id)
             {
                 return NotFound();
             }
+
+            //var oldSubcategory = _context.Subcategories.Find(id);
+            //_context.Entry<Subcategories>(oldSubcategory).State = EntityState.Detached;
+
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(subcategories);
+                    _context.Update(subcategory);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!SubcategoriesExists(subcategories.Id))
+                    if (!SubcategoriesExists(subcategory.Id))
                     {
                         return NotFound();
                     }
@@ -124,10 +134,10 @@ namespace MoneyManagerUI.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("IndexByCategory", new { id = categoryId });
             }
-            ViewData["CatedoryId"] = new SelectList(_context.Categories, "Id", "Name", subcategories.CatedoryId);
-            return View(subcategories);
+            ViewData["CatedoryId"] = new SelectList(_context.Categories, "Id", "Name", subcategory.CatedoryId);
+            return View(subcategory);
         }
 
         // GET: Subcategories/Delete/5
@@ -138,15 +148,16 @@ namespace MoneyManagerUI.Controllers
                 return NotFound();
             }
 
-            var subcategories = await _context.Subcategories
+            var subcategory = await _context.Subcategories
                 .Include(s => s.Catedory)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (subcategories == null)
+            if (subcategory == null)
             {
                 return NotFound();
             }
+            ViewBag.CategoryId = subcategory.CatedoryId;
 
-            return View(subcategories);
+            return View(subcategory);
         }
 
         // POST: Subcategories/Delete/5
@@ -161,10 +172,11 @@ namespace MoneyManagerUI.Controllers
                 _context.RecordsTags.RemoveRange(rt);
             }
             _context.Records.RemoveRange(records);
-            var subcategories = await _context.Subcategories.FindAsync(id);
-            _context.Subcategories.Remove(subcategories);
+            var subcategory = await _context.Subcategories.FindAsync(id);
+            var categoryId = subcategory.CatedoryId;
+            _context.Subcategories.Remove(subcategory);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("IndexByCategory", new { id = categoryId });
         }
 
         private bool SubcategoriesExists(int id)

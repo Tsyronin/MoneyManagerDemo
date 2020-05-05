@@ -9,8 +9,8 @@ namespace MoneyManagerUI.ViewModel
         public string Email { get; set; }
 
         [Required]
-        [DataType(DataType.Password)]
         [Display(Name = "New Password")]
+        [DataType(DataType.Password)]
         public string NewPassword { get; set; }
 
         [Required]

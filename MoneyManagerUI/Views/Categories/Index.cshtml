@@ -21,7 +21,7 @@
 <h1>Select Category</h1>
 <div class="col-sm-3 float-right">
     <button id="statsButton"
-            class="btn btn-secondary btn-lg float-right"
+            class="btn btn-secondary btn-lg active float-right"
             onclick="showHide()">
         Show Statistics
     </button>
@@ -120,10 +120,13 @@
         {
         <tr>
             <td>
-                <a asp-action="Details" asp-route-id="@item.Id">@item.Name</a>
+                <a asp-action="Details" asp-route-id="@item.Id" style="font-size:17px;">@item.Name</a>
             </td>
             <td>
-                <a class="btn btn-sm btn-primary" asp-action="AddSubcat" asp-route-id="@item.Id">Add Subcategory</a>
+                <a class="btn btn-sm btn-primary" asp-controller="Records" asp-action="Create" asp-route-id="@item.Id">Add Record</a>
+            </td>
+            <td>
+                <a class="btn btn-sm btn-primary" asp-action="IndexByCategory" asp-controller="Subcategories" asp-route-id="@item.Id">Subcategories</a>
                 <a class="btn btn-sm btn-primary" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
             </td>
             <td>
@@ -143,6 +146,7 @@
                 <input type="file" name="fileExcel" id="fileExcel" />
                 <div>
                     <input type="submit" value="Upload data" class="btn btn-success" />
+                    <span class="text-danger">@ViewBag.DataInputErrorMessage</span>
                 </div>
             </div>
         }

@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Identity;
 using MoneyManagerUI.Models;
 using MoneyManagerUI.ViewModel;
 using MoneyManagerUI.ViewModels;
-using MoneyManagerUI;
 using NETCore.MailKit.Core;
 
 namespace LibraryMVC.Controllers
@@ -126,12 +125,6 @@ namespace LibraryMVC.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        //[HttpPost]
-        //public async Task<IActionResult> Logout()
-        //{
-        //    await _signInManager.SignOutAsync();
-        //    return RedirectToAction("Index", "Home");
-        //}
     }
 }
 
